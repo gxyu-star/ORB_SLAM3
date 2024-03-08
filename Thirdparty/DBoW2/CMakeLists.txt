@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
+set(CMAKE_TOOLCHAIN_FILE "C:\\dev\\vcpkg_xim\\scripts\\buildsystems\\vcpkg.cmake")
 project(DBoW2)
 
 if(NOT CMAKE_BUILD_TYPE)

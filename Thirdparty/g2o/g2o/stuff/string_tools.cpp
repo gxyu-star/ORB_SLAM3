@@ -97,7 +97,11 @@ std::string formatString(const char* fmt, ...)
   char* auxPtr = NULL;
   va_list arg_list;
   va_start(arg_list, fmt);
+#ifdef WIN32
+  int numChar = sprintf(auxPtr, fmt, arg_list);
+#else
   int numChar = vasprintf(&auxPtr, fmt, arg_list);
+#endif
   va_end(arg_list);
   string retString;
   if (numChar != -1)
@@ -114,7 +118,11 @@ int strPrintf(std::string& str, const char* fmt, ...)
   char* auxPtr = NULL;
   va_list arg_list;
   va_start(arg_list, fmt);
+#ifdef WIN32
+  int numChars = sprintf(auxPtr, fmt, arg_list);
+#else
   int numChars = vasprintf(&auxPtr, fmt, arg_list);
+#endif
   va_end(arg_list);
   str = auxPtr;
   free(auxPtr);

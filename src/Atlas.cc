@@ -252,7 +252,12 @@ Map* Atlas::GetCurrentMap()
     if(!mpCurrentMap)
         CreateNewMap();
     while(mpCurrentMap->IsBad())
-        usleep(3000);
+#ifdef WIN32
+      //std::this_thread::sleep_for(3ms);
+    std::this_thread::sleep_for(3ms);
+#else
+      usleep(3000);
+#endif
 
     return mpCurrentMap;
 }

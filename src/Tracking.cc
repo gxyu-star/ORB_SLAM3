@@ -1671,7 +1671,11 @@ void Tracking::PreintegrateIMU()
             }
         }
         if(bSleep)
-            usleep(500);
+#ifdef WIN32
+          std::this_thread::sleep_for(1ms);
+#else
+          usleep(500);
+#endif
     }
 
     const int n = mvImuFromLastFrame.size()-1;
@@ -1798,7 +1802,11 @@ void Tracking::Track()
     {
         std::cout << "Tracking: Waiting to the next step" << std::endl;
         while(!mbStep && bStepByStep)
-            usleep(500);
+#ifdef WIN32
+          std::this_thread::sleep_for(1ms);
+#else
+          usleep(500);
+#endif
         mbStep = false;
     }
 
@@ -3784,7 +3792,11 @@ void Tracking::Reset(bool bLocMap)
     {
         mpViewer->RequestStop();
         while(!mpViewer->isStopped())
-            usleep(3000);
+#ifdef WIN32
+          std::this_thread::sleep_for(3ms);
+#else
+          usleep(3000);
+#endif
     }
 
     // Reset Local Mapping
@@ -3844,7 +3856,11 @@ void Tracking::ResetActiveMap(bool bLocMap)
     {
         mpViewer->RequestStop();
         while(!mpViewer->isStopped())
-            usleep(3000);
+#ifdef WIN32
+          std::this_thread::sleep_for(3ms);
+#else
+          usleep(3000);
+#endif
     }
 
     Map* pMap = mpAtlas->GetCurrentMap();
@@ -4010,7 +4026,11 @@ void Tracking::UpdateFrameIMU(const float s, const IMU::Bias &b, KeyFrame* pCurr
 
     while(!mCurrentFrame.imuIsPreintegrated())
     {
-        usleep(500);
+#ifdef WIN32
+      std::this_thread::sleep_for(1ms);
+#else
+      usleep(500);
+#endif
     }
 
 

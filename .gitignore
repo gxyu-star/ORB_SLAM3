@@ -91,3 +91,7 @@ my_settings.txt
 borrar/*
 
 */ExecMean.txt
+build_vc17/
+Thirdparty/g2o/bin/
+*/*/Debug/*
+*/*/Release/*

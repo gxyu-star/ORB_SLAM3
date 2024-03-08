@@ -261,7 +261,12 @@ void LocalMapping::Run()
             // Safe area to stop
             while(isStopped() && !CheckFinish())
             {
-                usleep(3000);
+#ifdef WIN32
+              std::this_thread::sleep_for(3ms);
+              std::this_thread::sleep_for(3ms);
+#else
+              usleep(3000);
+#endif
             }
             if(CheckFinish())
                 break;
@@ -275,7 +280,11 @@ void LocalMapping::Run()
         if(CheckFinish())
             break;
 
+#ifdef WIN32
+        std::this_thread::sleep_for(3ms);
+#else
         usleep(3000);
+#endif
     }
 
     SetFinish();
@@ -1069,7 +1078,11 @@ void LocalMapping::RequestReset()
             if(!mbResetRequested)
                 break;
         }
+#ifdef WIN32
+        std::this_thread::sleep_for(3ms);
+#else
         usleep(3000);
+#endif
     }
     cout << "LM: Map reset, Done!!!" << endl;
 }
@@ -1091,7 +1104,11 @@ void LocalMapping::RequestResetActiveMap(Map* pMap)
             if(!mbResetRequestedActiveMap)
                 break;
         }
+#ifdef WIN32
+        std::this_thread::sleep_for(3ms);
+#else
         usleep(3000);
+#endif
     }
     cout << "LM: Active map reset, Done!!!" << endl;
 }

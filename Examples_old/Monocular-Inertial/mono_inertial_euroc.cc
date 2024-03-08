@@ -186,17 +186,17 @@ int main(int argc, char *argv[])
     #ifdef COMPILEDWITHC11
             std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
     #else
-            std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
+            std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
     #endif
 
             // Pass the image to the SLAM system
-            // cout << "tframe = " << tframe << endl;
+            cout << "tframe = " << tframe <<" vImuMeas size: " << vImuMeas.size() << endl;
             SLAM.TrackMonocular(im,tframe,vImuMeas); // TODO change to monocular_inertial
 
     #ifdef COMPILEDWITHC11
             std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
     #else
-            std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
+            std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
     #endif
 
 #ifdef REGISTER_TIMES
@@ -218,7 +218,12 @@ int main(int argc, char *argv[])
                 T = tframe-vTimestampsCam[seq][ni-1];
 
             if(ttrack<T)
-                usleep((T-ttrack)*1e6); // 1e6
+#ifdef WIN32
+            //std::cout << std::fixed << std::setprecision(9) << "T-ttrack: " << (T - ttrack) * 1e3 << std::endl;
+            std::this_thread::sleep_for(10ms);
+#else 
+              usleep((T - ttrack) * 1e6); // 1e6
+#endif
         }
         if(seq < num_seq - 1)
         {
@@ -259,14 +264,15 @@ void LoadImages(const string &strImagePath, const string &strPathTimes,
     {
         string s;
         getline(fTimes,s);
-        if(!s.empty())
+        if (!s.empty() && s[0] != '#')
         {
-            stringstream ss;
-            ss << s;
-            vstrImages.push_back(strImagePath + "/" + ss.str() + ".png");
-            double t;
-            ss >> t;
-            vTimeStamps.push_back(t/1e9);
+          stringstream ss;
+          ss << s.substr(0, s.find_first_of(','));
+          vstrImages.push_back(strImagePath + "/" + ss.str() + ".png");
+          double t;
+          ss >> t;
+          std::cout << std::fixed << std::setprecision(9) << "img_time: " << t / 1e9 << std::endl;
+          vTimeStamps.push_back(t / 1e9);
 
         }
     }
@@ -300,7 +306,7 @@ void LoadIMU(const string &strImuPath, vector<double> &vTimeStamps, vector<cv::P
             }
             item = s.substr(0, pos);
             data[6] = stod(item);
-
+            std::cout << std::fixed <<std::setprecision(9) << "imu_time: " << data[0] / 1e9 << std::endl;
             vTimeStamps.push_back(data[0]/1e9);
             vAcc.push_back(cv::Point3f(data[4],data[5],data[6]));
             vGyro.push_back(cv::Point3f(data[1],data[2],data[3]));

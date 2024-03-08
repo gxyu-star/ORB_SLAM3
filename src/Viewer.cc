@@ -372,7 +372,11 @@ void Viewer::Run()
         {
             while(isStopped())
             {
-                usleep(3000);
+#ifdef WIN32
+              std::this_thread::sleep_for(3ms);
+#else
+              usleep(3000);
+#endif
             }
         }
 

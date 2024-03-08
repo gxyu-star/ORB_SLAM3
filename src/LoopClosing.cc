@@ -302,7 +302,11 @@ void LoopClosing::Run()
             break;
         }
 
+#ifdef WIN32
+        std::this_thread::sleep_for(5ms);
+#else
         usleep(5000);
+#endif
     }
 
     SetFinish();
@@ -995,7 +999,11 @@ void LoopClosing::CorrectLoop()
     // Wait until Local Mapping has effectively stopped
     while(!mpLocalMapper->isStopped())
     {
-        usleep(1000);
+#ifdef WIN32
+      std::this_thread::sleep_for(1ms);
+#else
+      usleep(1000);
+#endif
     }
 
     // Ensure current keyframe is updated
@@ -1249,7 +1257,11 @@ void LoopClosing::MergeLocal()
     // Wait until Local Mapping has effectively stopped
     while(!mpLocalMapper->isStopped())
     {
-        usleep(1000);
+#ifdef WIN32
+      std::this_thread::sleep_for(1ms);
+#else
+      usleep(1000);
+#endif
     }
     //cout << "Local Map stopped" << endl;
 
@@ -1708,7 +1720,11 @@ void LoopClosing::MergeLocal()
         // Wait until Local Mapping has effectively stopped
         while(!mpLocalMapper->isStopped())
         {
-            usleep(1000);
+#ifdef WIN32
+          std::this_thread::sleep_for(1ms);
+#else
+          usleep(1000);
+#endif
         }
 
         // Optimize graph (and update the loop position for each element form the begining to the end)
@@ -1822,7 +1838,11 @@ void LoopClosing::MergeLocal2()
     // Wait until Local Mapping has effectively stopped
     while(!mpLocalMapper->isStopped())
     {
-        usleep(1000);
+#ifdef WIN32
+      _sleep(1);
+#else
+      usleep(1000);
+#endif
     }
     //cout << "Local Map stopped" << endl;
 
@@ -2211,7 +2231,11 @@ void LoopClosing::RequestReset()
         if(!mbResetRequested)
             break;
         }
+#ifdef WIN32
+        std::this_thread::sleep_for(5ms);
+#else
         usleep(5000);
+#endif
     }
 }
 
@@ -2230,7 +2254,11 @@ void LoopClosing::RequestResetActiveMap(Map *pMap)
             if(!mbResetActiveMapRequested)
                 break;
         }
+#ifdef WIN32
+        std::this_thread::sleep_for(3ms);
+#else
         usleep(3000);
+#endif
     }
 }
 
@@ -2322,7 +2350,11 @@ void LoopClosing::RunGlobalBundleAdjustment(Map* pActiveMap, unsigned long nLoop
 
             while(!mpLocalMapper->isStopped() && !mpLocalMapper->isFinished())
             {
-                usleep(1000);
+#ifdef WIN32
+              std::this_thread::sleep_for(1ms);
+#else
+              usleep(1000);
+#endif
             }
 
             // Get Map Mutex

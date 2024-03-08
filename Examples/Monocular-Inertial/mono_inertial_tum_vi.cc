@@ -22,6 +22,7 @@
 #include<chrono>
 #include <ctime>
 #include <sstream>
+#include <thread>
 
 #include<opencv2/core/core.hpp>
 
@@ -198,7 +199,7 @@ int main(int argc, char **argv)
     #ifdef COMPILEDWITHC11
             std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
     #else
-            std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
+            std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
     #endif
 
             // Pass the image to the SLAM system
@@ -208,7 +209,7 @@ int main(int argc, char **argv)
     #ifdef COMPILEDWITHC11
             std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
     #else
-            std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
+            std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
     #endif
 
 #ifdef REGISTER_TIMES
@@ -230,8 +231,13 @@ int main(int argc, char **argv)
                 T = tframe-vTimestampsCam[seq][ni-1];
 
             if(ttrack<T)
-                usleep((T-ttrack)*1e6); // 1e6
-
+#ifdef WIN32
+              //Sleep((T-ttrack)*1e3); // 1e6              
+            //std::this_thread::sleep_for(std::chrono::milliseconds((uint64_t)((T - ttrack) * 1e6)));
+              std::this_thread::sleep_for(10ms);
+#else
+              usleep((T - ttrack) * 1e6); // 1e6
+#endif
         }
         if(seq < num_seq - 1)
         {
@@ -302,7 +308,7 @@ void LoadImagesTUMVI(const string &strImagePath, const string &strPathTimes,
             if (s[0] == '#')
                 continue;
 
-            int pos = s.find(' ');
+            int pos = s.find(',');
             string item = s.substr(0, pos);
 
             vstrImages.push_back(strImagePath + "/" + item + ".png");

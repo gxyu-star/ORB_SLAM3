@@ -40,6 +40,7 @@
 #include "ImuTypes.h"
 #include "Settings.h"
 
+#define ORB_SLAM3_DLL_API __declspec(dllexport)
 
 namespace ORB_SLAM3
 {
@@ -80,7 +81,7 @@ class LocalMapping;
 class LoopClosing;
 class Settings;
 
-class System
+class ORB_SLAM3_DLL_API System
 {
 public:
     // Input sensor

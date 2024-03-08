@@ -132,7 +132,7 @@ int main(int argc, char **argv)
     #ifdef COMPILEDWITHC11
             std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
     #else
-            std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
+            std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
     #endif
 
             // Pass the image to the SLAM system
@@ -142,7 +142,7 @@ int main(int argc, char **argv)
     #ifdef COMPILEDWITHC11
             std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
     #else
-            std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
+            std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
     #endif
 
 #ifdef REGISTER_TIMES
@@ -166,7 +166,12 @@ int main(int argc, char **argv)
 
             if(ttrack<T) {
                 //std::cout << "usleep: " << (dT-ttrack) << std::endl;
-                usleep((T-ttrack)*1e6); // 1e6
+#ifdef WIN32
+              std::this_thread::sleep_for(std::chrono::milliseconds((uint64_t)((T - ttrack) * 1e6)));
+#else
+              usleep((T - ttrack) * 1e6); // 1e6
+#endif
+                
             }
         }
 
@@ -214,14 +219,15 @@ void LoadImages(const string &strImagePath, const string &strPathTimes,
     {
         string s;
         getline(fTimes,s);
-        if(!s.empty())
+        if (!s.empty() && s[0] != '#')
         {
-            stringstream ss;
-            ss << s;
-            vstrImages.push_back(strImagePath + "/" + ss.str() + ".png");
-            double t;
-            ss >> t;
-            vTimeStamps.push_back(t*1e-9);
+          stringstream ss;
+          ss << s.substr(0, s.find_first_of(','));
+          vstrImages.push_back(strImagePath + "/" + ss.str() + ".png");
+          double t;
+          ss >> t;
+          std::cout << std::fixed << std::setprecision(9) << "img_time: " << t / 1e9 << std::endl;
+          vTimeStamps.push_back(t / 1e9);
 
         }
     }

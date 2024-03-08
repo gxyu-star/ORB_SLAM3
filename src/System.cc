@@ -237,7 +237,7 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     }
 
     // Fix verbosity
-    Verbose::SetTh(Verbose::VERBOSITY_QUIET);
+    Verbose::SetTh(Verbose::VERBOSITY_DEBUG);
 
 }
 
@@ -278,7 +278,11 @@ Sophus::SE3f System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight, 
             // Wait until Local Mapping has effectively stopped
             while(!mpLocalMapper->isStopped())
             {
-                usleep(1000);
+#ifdef WIN32
+                std::this_thread::sleep_for(1ms);
+#else
+							usleep(1000);
+#endif
             }
 
             mpTracker->InformOnlyTracking(true);
@@ -353,7 +357,11 @@ Sophus::SE3f System::TrackRGBD(const cv::Mat &im, const cv::Mat &depthmap, const
             // Wait until Local Mapping has effectively stopped
             while(!mpLocalMapper->isStopped())
             {
-                usleep(1000);
+#ifdef WIN32
+							std::this_thread::sleep_for(1ms);
+#else
+							usleep(1000);
+#endif
             }
 
             mpTracker->InformOnlyTracking(true);
@@ -428,7 +436,11 @@ Sophus::SE3f System::TrackMonocular(const cv::Mat &im, const double &timestamp, 
             // Wait until Local Mapping has effectively stopped
             while(!mpLocalMapper->isStopped())
             {
-                usleep(1000);
+#ifdef WIN32
+							std::this_thread::sleep_for(1ms);
+#else
+							usleep(1000);
+#endif
             }
 
             mpTracker->InformOnlyTracking(true);
