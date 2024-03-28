@@ -198,6 +198,7 @@ void MapDrawer::DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph, const b
             KeyFrame* pKF = vpKFs[i];
             Eigen::Matrix4f Twc = pKF->GetPoseInverse().matrix();
             unsigned int index_color = pKF->mnOriginMapId;
+            
 
             glPushMatrix();
 
@@ -208,6 +209,8 @@ void MapDrawer::DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph, const b
                 glLineWidth(mKeyFrameLineWidth*5);
                 glColor3f(1.0f,0.0f,0.0f);
                 glBegin(GL_LINES);
+                Sophus::SE3f Tcw = pKF->GetPose();
+                std::cout << i << ": MapDrawer Tcw: x, " << Tcw.translation().x() << ", y, " << Tcw.translation().y() << ", z, " << Tcw.translation().z() << std::endl;
             }
             else
             {

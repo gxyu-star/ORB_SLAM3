@@ -3205,6 +3205,7 @@ void Optimizer::InertialOptimization(Map *pMap, Eigen::Matrix3d &Rwg, double &sc
 
     IMU::Bias b (vb[3],vb[4],vb[5],vb[0],vb[1],vb[2]);
     Rwg = VGDir->estimate().Rwg;
+    std::cout << "New Rwg " << Rwg << std::endl;
 
     //Keyframes velocities and biases
     const int N = vpKFs.size();

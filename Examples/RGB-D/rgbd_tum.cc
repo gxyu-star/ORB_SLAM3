@@ -71,7 +71,8 @@ int main(int argc, char **argv)
     cout << "Images in the sequence: " << nImages << endl << endl;
 
     // Main loop
-    cv::Mat imRGB, imD;
+    cv::Mat imRGB;
+    cv::Mat imD;
     for(int ni=0; ni<nImages; ni++)
     {
         // Read image and depthmap from file
@@ -97,7 +98,7 @@ int main(int argc, char **argv)
 #ifdef COMPILEDWITHC11
         std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 #else
-        std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
+        std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 #endif
 
         // Pass the image to the SLAM system
@@ -106,7 +107,7 @@ int main(int argc, char **argv)
 #ifdef COMPILEDWITHC11
         std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
 #else
-        std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
+        std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
 #endif
 
         double ttrack= std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
@@ -120,8 +121,12 @@ int main(int argc, char **argv)
         else if(ni>0)
             T = tframe-vTimestamps[ni-1];
 
-        if(ttrack<T)
+        if (ttrack < T)
+#ifdef WIN32
+          std::this_thread::sleep_for(10ms);
+#else
             usleep((T-ttrack)*1e6);
+#endif
     }
 
     // Stop all threads
@@ -157,15 +162,15 @@ void LoadImages(const string &strAssociationFilename, vector<string> &vstrImageF
         if(!s.empty())
         {
             stringstream ss;
-            ss << s;
+            ss << s.substr(0, s.find_first_of(','));
             double t;
             string sRGB, sD;
             ss >> t;
             vTimestamps.push_back(t);
-            ss >> sRGB;
-            vstrImageFilenamesRGB.push_back(sRGB);
-            ss >> t;
-            ss >> sD;
+            sRGB = "mav0/cam0/data/" + ss.str() + ".png";
+            vstrImageFilenamesRGB.push_back(sRGB);           
+            sD = "depth/" + s.substr(s.find_first_of(',') + 1, s.size() - s.find_first_of(',')); + ".png";
+            std::cout << sD << std::endl;
             vstrImageFilenamesD.push_back(sD);
 
         }

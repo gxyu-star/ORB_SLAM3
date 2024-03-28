@@ -102,10 +102,14 @@ int main(int argc, char **argv)
         int proccIm = 0;
         for(int ni=0; ni<nImages[seq]; ni++, proccIm++)
         {
-            // Read left and right images from file
-            imLeft = cv::imread(vstrImageLeft[seq][ni],cv::IMREAD_UNCHANGED); //,cv::IMREAD_UNCHANGED);
-            imRight = cv::imread(vstrImageRight[seq][ni],cv::IMREAD_UNCHANGED); //,cv::IMREAD_UNCHANGED);
-
+          // Read left and right images from file
+          cv::Mat imLeft = cv::imread(vstrImageLeft[seq][ni], cv::IMREAD_GRAYSCALE); //,cv::IMREAD_UNCHANGED);
+          cv::Mat imRight = cv::imread(vstrImageRight[seq][ni], cv::IMREAD_GRAYSCALE); //,cv::IMREAD_UNCHANGED);
+          //cv::Mat imLeft_tmp = cv::imread(vstrImageLeft[seq][ni], cv::IMREAD_GRAYSCALE); //,cv::IMREAD_UNCHANGED);
+          //cv::Mat imRight_tmp = cv::imread(vstrImageRight[seq][ni], cv::IMREAD_GRAYSCALE); //,cv::IMREAD_UNCHANGED);
+          //cv::resize(imLeft_tmp, imLeft, cv::Size(640, 400));
+          //cv::resize(imRight_tmp, imRight, cv::Size(640, 400));
+          
             if(imLeft.empty())
             {
                 cerr << endl << "Failed to load image at: "
@@ -119,7 +123,9 @@ int main(int argc, char **argv)
                      << string(vstrImageRight[seq][ni]) << endl;
                 return 1;
             }
-
+            cv::imshow("imLeft", imLeft);
+            char key = cv::waitKey(1);
+            if (key == 'q') break;
             double tframe = vTimestampsCam[seq][ni];
 
     #ifdef COMPILEDWITHC11
@@ -205,10 +211,11 @@ void LoadImages(const string &strPathLeft, const string &strPathRight, const str
         {
           stringstream ss;
           ss << s.substr(0, s.find_first_of(','));
-          vstrImageLeft.push_back(strPathLeft + "/" + ss.str() + ".png");
-          vstrImageRight.push_back(strPathRight + "/" + ss.str() + ".png");
           double t;
           ss >> t;
+          //if (t < 734145000000) continue;
+          vstrImageLeft.push_back(strPathLeft + "/" + ss.str() + ".png");
+          vstrImageRight.push_back(strPathRight + "/" + ss.str() + ".png");          
           vTimeStamps.push_back(t / 1e9);
 
         }

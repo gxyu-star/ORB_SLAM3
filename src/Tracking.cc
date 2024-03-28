@@ -1635,7 +1635,7 @@ void Tracking::PreintegrateIMU()
     mvImuFromLastFrame.reserve(mlQueueImuData.size());
     if(mlQueueImuData.size() == 0)
     {
-        Verbose::PrintMess("Not IMU data in mlQueueImuData!!", Verbose::VERBOSITY_NORMAL);
+        Verbose::PrintMess("No IMU data in mlQueueImuData!!", Verbose::VERBOSITY_NORMAL);
         mCurrentFrame.setIntegrated();
         return;
     }
@@ -1725,6 +1725,7 @@ void Tracking::PreintegrateIMU()
 
         if (!mpImuPreintegratedFromLastKF)
             cout << "mpImuPreintegratedFromLastKF does not exist" << endl;
+        //std::cout << "tstep: " << tstep << ", acc, " << acc(0) << ", " << acc(1) << ", " << acc(2) << std::endl;
         mpImuPreintegratedFromLastKF->IntegrateNewMeasurement(acc,angVel,tstep);
         pImuPreintegratedFromLastFrame->IntegrateNewMeasurement(acc,angVel,tstep);
     }
@@ -2354,7 +2355,7 @@ void Tracking::StereoInitialization()
 
             if (!mFastInit && (mCurrentFrame.mpImuPreintegratedFrame->avgA-mLastFrame.mpImuPreintegratedFrame->avgA).norm()<0.5)
             {
-                cout << "not enough acceleration" << endl;
+                cout << "not enough acceleration, " << mCurrentFrame.mTimeStamp << endl;
                 return;
             }
 
@@ -2425,6 +2426,9 @@ void Tracking::StereoInitialization()
                 }
             }
         }
+
+        Sophus::SE3f T_c_w = pKFini->GetPose();
+        Verbose::PrintMess("Init key frame rot angleX, " + to_string(T_c_w.angleX()) + ", angleY, " + to_string(T_c_w.angleY()) + ", angleZ, " + to_string(T_c_w.angleZ()), Verbose::VERBOSITY_QUIET);
 
         Verbose::PrintMess("New Map created with " + to_string(mpAtlas->MapPointsInMap()) + " points", Verbose::VERBOSITY_QUIET);
 
@@ -2744,14 +2748,14 @@ bool Tracking::TrackReferenceKeyFrame()
     }
 
     mCurrentFrame.mvpMapPoints = vpMapPointMatches;
-    mCurrentFrame.SetPose(mLastFrame.GetPose());
+    mCurrentFrame.SetPose(mpReferenceKF->GetPose());
 
     //mCurrentFrame.PrintPointDistribution();
 
 
-    // cout << " TrackReferenceKeyFrame mLastFrame.mTcw:  " << mLastFrame.mTcw << endl;
+    cout << " TrackReferenceKeyFrame mCurrentFrame.mTcw:  " << mCurrentFrame.GetPose().translation() << endl;
     Optimizer::PoseOptimization(&mCurrentFrame);
-
+    cout << " TrackReferenceKeyFrame mCurrentFrame.mTcw:  " << mCurrentFrame.GetPose().translation() << endl;
     // Discard outliers
     int nmatchesMap = 0;
     for(int i =0; i<mCurrentFrame.N; i++)
@@ -4009,6 +4013,8 @@ void Tracking::UpdateFrameIMU(const float s, const IMU::Bias &b, KeyFrame* pCurr
         while(pKF->isBad())
         {
             pKF = pKF->GetParent();
+            //Sophus::SE3f Tcw = pKF->GetPose();
+            //std::cout << "UpdateFrameIMU Tcw: x, " << Tcw.translation().x() << ", y, " << Tcw.translation().y() << ", z, " << Tcw.translation().z() << std::endl;
         }
 
         if(pKF->GetMap() == pMap)

@@ -1259,6 +1259,7 @@ void LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
         }
 
         dirG = dirG/dirG.norm();
+        std::cout << "dirG, " << dirG << std::endl;
         Eigen::Vector3f gI(0.0f, 0.0f, -1.0f);
         Eigen::Vector3f v = gI.cross(dirG);
         const float nv = v.norm();
@@ -1267,6 +1268,7 @@ void LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
         Eigen::Vector3f vzg = v*ang/nv;
         Rwg = Sophus::SO3f::exp(vzg).matrix();
         mRwg = Rwg.cast<double>();
+        std::cout << "mRwg, " << mRwg << std::endl;
         mTinit = mpCurrentKeyFrame->mTimeStamp-mFirstTs;
     }
     else
@@ -1316,7 +1318,8 @@ void LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
         mpTracker->t0IMU = mpTracker->mCurrentFrame.mTimeStamp;
         mpCurrentKeyFrame->bImu = true;
     }
-
+    Sophus::SE3f Tcw = mpCurrentKeyFrame->GetPose();
+    std::cout << "mpCurrentKeyFrame1 Tcw: x, " << Tcw.translation().x() << ", y, " << Tcw.translation().y() << ", z, " << Tcw.translation().z() << std::endl;
     std::chrono::steady_clock::time_point t4 = std::chrono::steady_clock::now();
     if (bFIBA)
     {
@@ -1345,7 +1348,10 @@ void LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
 
     // Correct keyframes starting at map first keyframe
     list<KeyFrame*> lpKFtoCheck(mpAtlas->GetCurrentMap()->mvpKeyFrameOrigins.begin(),mpAtlas->GetCurrentMap()->mvpKeyFrameOrigins.end());
-
+    
+    Sophus::SE3f Tcw2 = mpCurrentKeyFrame->GetPose();
+    std::cout << "mpCurrentKeyFrame2 Tcw: x, " << Tcw2.translation().x() << ", y, " << Tcw2.translation().y() << ", z, " << Tcw2.translation().z() << std::endl;
+    
     while(!lpKFtoCheck.empty())
     {
         KeyFrame* pKF = lpKFtoCheck.front();

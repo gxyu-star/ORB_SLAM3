@@ -128,8 +128,12 @@ int main(int argc, char* argv[])
     {
       // Read image from file
       im = cv::imread(vstrImageFilenames[seq][ni], cv::IMREAD_UNCHANGED); //CV_LOAD_IMAGE_UNCHANGED);
-      /*cv::Ptr<cv::CLAHE> clahe = cv::createCLAHE(3.0, cv::Size(5, 5));
-      clahe->apply(im, im);*/
+      uint64* t = (uint64*)&(im.data[4]);
+      std::string t_str = vstrImageFilenames[seq][ni].substr(vstrImageFilenames[seq][ni].find_last_of('/') + 1, vstrImageFilenames[seq][ni].size() - vstrImageFilenames[seq][ni].find_last_of('/') - 5).c_str();
+      double t_from_str = std::atof(t_str.c_str());
+      std::cout << t_from_str << ", "  << (*t)*1e5  << ", dt, " << double((*t) * 1e5 - t_from_str) * 1.0e-9 << "ms" << std::endl;
+      cv::Ptr<cv::CLAHE> clahe = cv::createCLAHE(3.0, cv::Size(5, 5));
+      clahe->apply(im, im);
       double tframe = vTimestampsCam[seq][ni];
 
       if (im.empty())
